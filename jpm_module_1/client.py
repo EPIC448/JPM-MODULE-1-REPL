@@ -17,51 +17,45 @@
   #  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
   #  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
   #  DEALINGS IN THE SOFTWARE.
+    import urlli2
+    import time
+    import json
+    import random
 
-  # First commit
+    # Server API URLs
+    QUERY = "http://localhost:8080/query?id={}"
 
-  import urllib2
-  import time
-  import json
-  import random
+    # 500 server request
+    N = 500
 
-  # Server API URLs
-  QUERY = "http://localhost:8080/query?id={}"
+    def getDataPoint(quote):
+      """ Produce all of the needed values to generate a datapoint """
+      """ ------------- Update this function ------------- """
+      stock = quote['stock']
+      bid_price = float(quote['top_bid']['price'])
+      ask_price = float(quote['top_ask']['price'])
 
-  # 500 server request
-  N = 500
+      #  change bid_price + ask_price  / 2
+      price = (bid_price + ask_price) / 2
+      return stock, bid_price, ask_price, price
 
-  def getDataPoint(quote):
-    """ Produce all of the needed values to generate a datapoint """
-    """ ------------- Update this function ------------- """
-    stock = quote['stock']
-    bid_price = float(quote['top_bid']['price'])
-    ask_price = float(quote['top_ask']['price'])
+    def getRatio(price_a, price_b):
+      if (price_b == 0):
+        #  except ZeroDivisionError 
+        #  print("Sorry you can divide by decimal") 
+        return
+        return  price_a/price_b
 
-    #  change bid_price + ask_price  / 2
-    price = (bid_price + ask_price) / 2
-    return stock, bid_price, ask_price, price
+    # Main
+    if __name__ == "__main__":
 
-  def getRatio(price_a, price_b):
-    """ Get ratio of price_a and price_b """
-    """ ------------- Update this function ------------- """
-    """ Also create some unit tests for this function in client_test.py """
-  if (price_b == 0):
-      #  except ZeroDivisionError 
-      #  print("Sorry you can divide by decimal") 
-      return
-      return  price_a/price_b
+      # Query the price once every N seconds.
+      for _ in range(N):
+        quotes = json.loads(urllib2.urlopen(QUERY.format(random.random())).read())
 
-  # Main
-  if __name__ == "__main__":
+        """ ----------- Update to get the ratio --------------- """
+        for quote in quotes:
+          stock, bid_price, ask_price, price = getDataPoint(quote)
+          print ("Quoted %s at (bid:%s, ask:%s, price:%s)" % (stock, bid_price, ask_price, price))
 
-    # Query the price once every N seconds.
-    for _ in range(N):
-      quotes = json.loads(urllib2.urlopen(QUERY.format(random.random())).read())
-
-      """ ----------- Update to get the ratio --------------- """
-      for quote in quotes:
-        stock, bid_price, ask_price, price = getDataPoint(quote)
-        print ("Quoted %s at (bid:%s, ask:%s, price:%s)" % (stock, bid_price, ask_price, price))
-
-      print ("Ratio %s" % (getRatio(prices['ÁBC'], prices['DEF'])))
+        print ("Ratio %s" % (getRatio(prices['ÁBC'], prices['DEF'])))
